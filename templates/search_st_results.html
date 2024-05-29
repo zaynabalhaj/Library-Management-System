@@ -1,0 +1,83 @@
+<h2>Search Results</h2>
+{% if message  %}
+    <p>No Students found by the given ID</p>
+{% elif message_1 %}
+    <p>{{ message_1 }}</p>
+{% elif info %}
+    <span>{{name}}</span>
+    <div class="table-container">
+        <table class="search-results-table">
+            <thead> 
+                <tr>
+                    <th>Title</th>
+                    <th>Deadline</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for in in info %}
+                    <tr>
+                        <td>{{ in[0] }}</td>
+                        <td>{{ in[1] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% elif holds %}
+    {% if holds == 'No holds' %}
+        <p>No holds</p>
+    {% else %}
+        <div class="table-container">
+            <table class="search-results-table">
+                <thead> 
+                    <tr>
+                        <th>Title</th>
+                        <th>ISBN</th>
+                        <th>Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for in in holds %}
+                        <tr>
+                            <td>{{ in[0] }}</td>
+                            <td>{{ in[1] }}</td>
+                            <td>{{ in[2] }}</td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% elif history %}
+        {% if history == 'No history log for this student' %}
+            <p>No History Log </p>
+        {% else %}
+        <div class="table-container">
+            <table class="search-results-table">
+                <thead> 
+                    <tr>
+                        <th>ISBN</th>
+                        <th>Deadline</th>
+                        <th>Librarian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for in in history %}
+                        <tr>
+                            <td>{{ in[0] }}</td>
+                            <td>{{ in[1] }}</td>
+                            <td>{{ in[2] }}</td>
+                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+
+
+
+
+{% endif %}

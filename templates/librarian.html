@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library System - Librarian</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'>
+    <link rel='stylesheet' href='static/styles.css'>
+</head>
+<body>
+    <div id="nav-bar">
+        <div id="menu-title">MENU</div>
+        <div>
+            <div class="nav-button" onclick="toggleSearchStudent()"><i class="fas fa-search"></i>Search Student</div>
+            <div class="nav-button" onclick="toggleDisplayHolds()"><i class="fas fa-layer-group"></i>Display Holds</div>
+            <div class="nav-button" onclick="toggleShowHistory()"><i class="fas fa-history"></i>Get History</div>
+            <div class="nav-button" onclick="toggleRequestBook()"><i class="fas fa-book"></i>Request Book</div>
+            <div class="nav-button" onclick="toggleBorrowBookStudent()"><i class="fas fa-book"></i>Borrow Book (Student)</div>
+            <div class="nav-button" onclick="toggleBorrowBookStaff()"><i class="fas fa-book"></i>Borrow Book (Staff)</div>
+        </div>
+        <div class="profile">
+            <i class="fas fa-user-circle"></i>
+            <span>{{ name }}</span>
+            <a href="/logout" class="logout">Logout</a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="welcome-message">
+            <h1>Welcome, Librarian!</h1>
+        </div>
+        <div class="search-container">
+            <div id="search-student-container" style="display: none;">
+                <input type="text" id="student-id" placeholder="Enter Student ID">
+                <button onclick="searchStudent()">Search</button>
+            </div>
+
+            <div id="display-student-container" style="display: none;">
+                <input type="text" id="student-id" placeholder="Enter Student ID">
+                <button onclick="displayHolds()">Display</button>
+            </div>
+            <div id="history-student-container" style="display: none;">
+                <input type="text" id="student-id" placeholder="Enter Student ID">
+                <button onclick="ShowHistory()">Show</button>
+            </div>
+            <div id="container" style="display: none;">
+                <form action="/borrow_student" method="post">
+                    <label for="student_id">SSN:</label>
+                    <input type="text" id="student_id" name="student_id" required>
+                    <label for="isbn:">ISBN:</label>
+                    <input type="text" id="isbn" name="isbn" required>
+                    <label for="deadline:">Deadline:</label>
+                    <input type="date" id="deadline" name="deadline" required>
+                    <button type="submit">Approve</button>
+                </form>
+            </div>
+            <div id="borrow_staff_container" style="display: none;">
+                <form action="/borrow_staff" method="post">
+                    <label for="staff_id">SSN:</label>
+                    <input type="text" id="staff_id" name="staff_id" required>
+                    <label for="isbn:">ISBN:</label>
+                    <input type="text" id="isbn" name="isbn" required>
+                    <label for="deadline:">Deadline:</label>
+                    <input type="date" id="deadline" name="deadline" required>
+                    <button type="submit">Approve</button>
+                </form>
+            </div>
+
+            <div id="request_book_container" style="display: none;">
+                <form action="/request_book" method="post">   
+                    <label for="isbn">ISBN:</label>
+                    <input type="text" id="isbn" name="isbn" required>
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                    <label for="bid:">AuthorID:</label>
+                    <input type="text" id="bid" name="bid" required>
+                <button onclick="requestBook()">Request</button>
+            </form> 
+            </div>
+        </div>
+        <div id="search-results"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function clearAll() {
+            clearSearchResults();
+            clearSearchBoxes();
+        }
+
+        function clearSearchResults() {
+            var searchResultsDiv = document.getElementById("search-results");
+            searchResultsDiv.innerHTML = "";
+        }
+
+        function clearSearchBoxes() {
+            var searchByStudentContainer = document.getElementById("search-student-container");
+            var DisplayContainer = document.getElementById("display-student-container");
+            var HistoryContainer = document.getElementById("history-student-container");
+            var BorrowContainer = document.getElementById("container");
+           
+            
+            searchByStudentContainer.style.display = "none";
+            DisplayContainer.style.display = "none";
+            HistoryContainer.style.display = "none";
+            BorrowContainer.style.display = "none";
+           
+        }
+
+
+        function toggleSearchStudent() {
+            clearAll();
+            var searchContainer = document.getElementById("search-student-container");
+            if (searchContainer.style.display === "none") {
+                searchContainer.style.display = "block";
+            } else {
+                searchContainer.style.display = "none";
+            }
+        }
+
+
+        function toggleDisplayHolds() {
+            clearAll();
+            var searchContainer = document.getElementById("display-student-container");
+            if (searchContainer.style.display === "none") {
+                searchContainer.style.display = "block";
+            } else {
+                searchContainer.style.display = "none";
+            }
+        }
+
+        function toggleShowHistory() {
+            clearAll();
+            var searchContainer = document.getElementById("history-student-container");
+            if (searchContainer.style.display === "none") {
+                searchContainer.style.display = "block";
+            } else {
+                searchContainer.style.display = "none";
+            }
+        }
+
+        function toggleRequestBook() {
+            clearAll();
+            var requestBookContainer = document.getElementById("request_book_container");
+            if (requestBookContainer.style.display === "none") {
+                requestBookContainer.style.display = "block";
+            } else {
+                requestBookContainer.style.display = "none";
+            }
+        }
+
+        function toggleBorrowBookStudent() {
+            clearAll();
+            var borrowContainer = document.getElementById("container");
+            if (borrowContainer.style.display === "none") {
+                borrowContainer.style.display = "block";
+                var form = document.getElementById("container").getElementsByTagName("form")[0];
+                form.onsubmit = function(event) {
+                    event.preventDefault(); 
+                    borrowBookStudents();
+                };
+            } else {
+                borrowContainer.style.display = "none";
+            }
+        }
+
+        function toggleBorrowBookStaff() {
+            clearAll();
+            var borrowContainer = document.getElementById("borrow_staff_container");
+            if (borrowContainer.style.display === "none") {
+                borrowContainer.style.display = "block";
+                var form = document.getElementById("borrow_staff_container").getElementsByTagName("form")[0];
+                form.onsubmit = function(event) {
+                    event.preventDefault(); 
+                    borrowBookStaff();
+                };
+            } else {
+                borrowContainer.style.display = "none";
+            }
+        }
+
+        function searchStudent() {
+            var studentId = $('#student-id').val();
+            clearAll();
+            $.ajax({
+                type: 'POST',
+                url: '/search_student',
+                data: {sid: studentId},
+                success: function(response) {
+                    $('#search-results').html(response);
+                },
+                error: function() {
+                    $('#search-results').html('Error occurred while searching.');
+                }
+            });
+        }
+
+        function displayHolds() {
+            var sid = $('#student-id').val();
+            console.log(sid)
+            clearAll();
+            $.ajax({
+                type: "POST",
+                url: "/display_holds_librarian",
+                data: {sid: sid},
+                success: function (response) {
+                    $('#search-results').html(response);
+                },
+                error: function() {
+                    $('#search-results').html('Error occurred while searching.');
+                }
+            });
+        }
+
+        function ShowHistory() {
+            var sid = $('#student-id').val();
+            console.log(sid)
+            clearAll();
+            $.ajax({
+                type: "POST",
+                url: "/history_librarian",
+                data: {sid: sid},
+                success: function (response) {
+                    $('#search-results').html(response);
+                },
+                error: function() {
+                    $('#search-results').html('Error occurred while searching.');
+                }
+            });
+        }
+
+        function requestBook() {
+            clearAll();
+            
+            var isbn = $('#isbn').val();
+            
+            var title = $('#title').val(); 
+            var bid = $('#bid').val();
+            $.ajax({
+                type: 'POST',
+                url: '/request_book',  // Make sure this endpoint is correctly set up in your Flask app
+                data: {
+                    isbn: isbn,
+                    title: title,
+                    bid: bid
+                },
+                success: function(response) {
+                    $('#search-results').html('Book request submitted successfully.');
+                },
+                error: function() {
+                    $('#search-results').html('Error occurred while submitting the request.');
+                }
+            });
+        }
+
+        function borrowBookStudents() {
+            var studentId = $('#student_id').val(); 
+            var deadline = $('#deadline').val();
+            var isbn = $('#isbn').val();
+            clearAll();
+            $.ajax({
+                type: 'POST',
+                url: '/borrow_student', 
+                data: {student_id: studentId, deadline: deadline, isbn: isbn},
+                success: function(response) {
+                    $('#search-results').html('Book borrowing approved successfully');
+                },
+                error: function() {
+                    $('#search-results').html('Error occurred while processing the request.');
+                }
+            });
+        }
+
+        function borrowBookStaff() {
+            var staffId = $('#staff_id').val(); 
+            var isbn = $('#isbn').val();
+            var deadline = $('#deadline').val();
+            clearAll();
+            $.ajax({
+                type: 'POST',
+                url: '/borrow_staff', 
+                data: {staff_id: staffId, isbn: isbn, deadline: deadline},
+                success: function(response) {
+                    $('#search-results').html('Book borrowing approved successfully');
+                },
+                error: function() {
+                    $('#search-results').html('Error occurred while processing the request.');
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

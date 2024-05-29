@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library System - Student</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'>
+    <link rel='stylesheet' href='static/styles.css'>
+</head>
+<body>
+    <div id="nav-bar">
+        <div id="menu-title">MENU</div>
+        <div>
+            <div class="nav-button" id="search-title" onclick="toggleSearchBox()"><i class="fas fa-search"></i>Search by Title</div>
+            <div class="nav-button" onclick="toggleSearchByGenre()"><i class="fas fa-search"></i>Search by Genre</div>
+            <div class="nav-button" onclick="toggleSearchByAuthor()"><i class="fas fa-search"></i>Search by Author</div>
+            <div class="nav-button" onclick="displayHolds()"><i class="fas fa-layer-group"></i>Display Holds</div>
+            <div class="nav-button" onclick="showHistory()"><i class="fas fa-history"></i>Borrowing History</div>
+        </div>
+        <div class="profile">
+            <i class="fas fa-user-circle"></i>
+            <span>{{ name }}</span>
+            <a href="/logout" class="logout">Logout</a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="welcome-message">
+            <h1>Welcome to University Libraries</h1>
+        </div>
+        <div class="search-container">
+            <div id="search_by_title">
+                <input type="text" id="title-input" placeholder="Enter Title">
+                <button id="search-button" onclick="searchByTitle()">Search</button>
+            </div>
+            <div id="search_by_genre" style="display: none;">
+                <div class="search-container">
+                    <label><input type="radio" name="genre" id="fiction-checkbox" value="Fiction"> Fiction</label>
+                    <label><input type="radio" name="genre" id="nonfiction-checkbox" value="Non-Fiction"> Non-Fiction</label>
+                    <label><input type="radio" name="genre" id="mystery-checkbox" value="Mystery"> Mystery</label>
+                    <button id="search-genre-button" onclick="searchByGenre()">Search</button>
+                </div>
+            </div>
+                       
+            <div id="search_by_author" style="display: none;">
+                <input type="text" id="author-fname-input" placeholder="Author's First Name">
+                <input type="text" id="author-lname-input" placeholder="Author's Last Name">
+                <button id="search-author-button" onclick="searchByAuthor()">Search</button>
+            </div>
+            <div id="display_holds">
+            </div>
+        </div>    
+        <div id="search-results"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function clearAll() {
+            clearSearchResults();
+            clearSearchBoxes();
+        }
+
+        function clearSearchResults() {
+            var searchResultsDiv = document.getElementById("search-results");
+            searchResultsDiv.innerHTML = "";
+        }
+
+        function clearSearchBoxes() {
+            var searchByTitleContainer = document.getElementById("search_by_title");
+            var searchByAuthorContainer = document.getElementById("search_by_author");
+            var searchByGenreContainer = document.getElementById("search_by_genre");
+
+            searchByTitleContainer.style.display = "none";
+            searchByAuthorContainer.style.display = "none";
+            searchByGenreContainer.style.display = "none";
+        }
+
+        function toggleSearchBox() {
+            clearAll();
+            var searchContainer = document.getElementById("search_by_title");
+            if (searchContainer.style.display === "none") {
+                searchContainer.style.display = "block";
+            } else {
+                searchContainer.style.display = "none";
+            }
+        }
+
+        function searchByTitle() {
+            clearAll();
+            var title = document.getElementById("title-input").value;
+
+            $.ajax({
+                type: "POST",
+                url: "/search_by_title",
+                data: { title: title },
+                success: function (data) {
+                    displaySearchResults(data);
+                }
+            });
+        }
+
+        function toggleSearchByAuthor() {
+            clearAll();
+            var searchByAuthorContainer = document.getElementById("search_by_author");
+            if (searchByAuthorContainer.style.display === "none") {
+                searchByAuthorContainer.style.display = "block";
+            } else {
+                searchByAuthorContainer.style.display = "none";
+            }
+        }
+
+        function searchByAuthor() {
+            clearAll();
+            var fname = document.getElementById("author-fname-input").value;
+            var lname = document.getElementById("author-lname-input").value;
+
+            $.ajax({
+                type: "POST",
+                url: "/search_by_author",
+                data: { fname: fname, lname: lname },
+                success: function (data) {
+                    displaySearchResults(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        function toggleSearchByGenre() {
+            clearAll();
+            var searchByGenreContainer = document.getElementById("search_by_genre");
+            if (searchByGenreContainer.style.display === "none") {
+                searchByGenreContainer.style.display = "block";
+            } else {
+                searchByGenreContainer.style.display = "none";
+            }
+        }
+
+        function searchByGenre() {
+            clearAll();
+            var selectedGenre = $("input[type='radio']:checked").val();
+
+            if (!selectedGenre) {
+                console.error("Please select a genre.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/search_by_genre",
+                data: { genre: selectedGenre },
+                success: function(data) {
+                    displaySearchResults(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        function displayHolds() {
+            clearAll();
+            $.ajax({
+                type: "GET",
+                url: "/display_holds",
+                success: function (data) {
+                    displaySearchResults(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        function showHistory() {
+            clearAll();
+            $.ajax({
+                type: "GET",
+                url: "/history",
+                success: function (data) {
+                    displaySearchResults(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+
+        function displaySearchResults(data) {
+            var searchResultsDiv = document.getElementById("search-results");
+            searchResultsDiv.innerHTML = data;
+        }
+
+
+
+    </script>
+</body>
+</html>

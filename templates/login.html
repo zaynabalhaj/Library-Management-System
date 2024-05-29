@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in - Library Management System</title>
+    <style>
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background-image: url("{{ url_for('static', filename='lib2.jpg') }}"); 
+            background-color: #f4f4f2; 
+            background-size: cover;
+            background-position: center; 
+            background-repeat: no-repeat;
+            color: #333;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        h1 {
+            text-align: center;
+            color: #9a755b;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #9a755b;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #9a755b;
+        }
+        p {
+            text-align: center;
+        }
+        a {
+            color: #9a755b;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Log In</h1>
+        {% if message %}
+        <p>{{ message }}</p>
+        {% endif %}
+        <form action="/login" method="post">
+            <label for="ssn">SSN:</label>
+            <input type="text" id="ssn" name="ssn" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Log in</button>
+        </form>
+        <p>Don't have an account? <a href="/signup">Signup</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<h2>Search Results</h2>
+{% if books == 'no_books' %}
+    <p>No Books found by the given author name</p>
+{% elif books == 'no_booksgen' %}
+    <p>No Books found by the given genre</p>
+{% elif holds %}
+    {% if holds == 'No holds' %}
+        <p>No holds recorded</p>
+    {% else %}
+        <div class="table-container">
+            <table class="search-results-table">
+                <thead> 
+                    <tr>
+                        <th>ISBN</th>
+                        <th>Title</th>
+                        <th>Previous Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hold in holds %}
+                        <tr>
+                            <td>{{ hold[1] }}</td>
+                            <td>{{ hold[0] }}</td>
+                            <td>{{ hold[2] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% elif history %}
+    {% if history == 'No borrowed books currently' %}
+        <p>No borrowed books currently</p>
+    {% else %}
+        <div class="table-container">
+            <table class="search-results-table">
+                <thead> 
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for his in history %}
+                        <tr>
+                            <td>{{ his[0] }}</td>
+                            <td>{{ his[1] }}</td>
+                            <td>{{ his[2] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% elif books  %}
+    <div class="table-container">
+        <table class="search-results-table">
+            <thead> 
+                <tr>
+                    <th>ISBN</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                    <tr>
+                        <td>{{ book[0] }}</td>
+                        <td>{{ book[1] }}</td>
+                        <td>{{ book[2] }} {{ book[3] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>No Books found with the given title</p>
+{% endif %}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Student - Library System</title>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'>
+    <link rel='stylesheet' href='static/styles.css'>
+    
+</head>
+<body>
+    <div id="nav-bar">
+        <div>
+            <div id="search-student" class="nav-button"><i class="fas fa-search"></i>Search Student</div>
+            <div id="display-holds" class="nav-button"><i class="fas fa-layer-group"></i>Display Holds</div>
+            <div id="get-history" class="nav-button"><i class="fas fa-history"></i>Get History</div>
+            <div id="request-book" class="nav-button"><i class="fas fa-book"></i>Request Book</div>
+            <div id="borrow-book-student" class="nav-button"><i class="fas fa-user-graduate"></i>Borrow Book (Student)</div>
+            <div id="borrow-book-staff" class="nav-button"><i class="fas fa-user-tie"></i>Borrow Book (Staff)</div>
+        </div>    
+        <div class="profile">
+            <i class="fas fa-user-circle"></i>
+            <span>Librarian Username</span>
+            <a href="/logout" class="logout">Logout</a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="welcome-message">
+            <h1>Welcome to University Libraries</h1>
+        </div>
+        <div class="search-container">
+            <input type="text" id="title-input" placeholder="Enter Student ID">
+            <button id="search-button" onclick="searchStudent()">Search</button>
+     </div>
+
+    <!-- Container to display search results -->
+    <div id="search-st-results"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function searchStudent() {
+            var title = document.getElementById("title-input").value;
+
+            $.ajax({
+                type: "POST",
+                url: "/search_student",
+                data: { sid: title},
+                success: function (data) {
+                    displaySearchResults(data);
+                }
+            });
+        }
+
+        function displaySearchResults(data) {
+            var searchResultsDiv = document.getElementById("search-st-results");
+            searchResultsDiv.innerHTML = data;
+            searchResultsDiv.classList.add("search-results");
+        }
+
+        document.getElementById('search-button').addEventListener('click', searchStudent);
+
+    </script>
+</body>
+</html>
